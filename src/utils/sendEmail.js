@@ -14,7 +14,7 @@ export const sendEmail = async ({ to, subject, html }) => {
 
   await transporter.sendMail({
     to,
-    from: '"Atena 🛒 " <yossef.mahmoud.shared@gmail.com>',
+    from: '"Nfc-healthcare-card 🪪" <yossef.mahmoud.shared@gmail.com>',
     subject,
     html,
   });
