@@ -6,7 +6,7 @@ import { bootStrap } from './src/bootStrap.js';
 
 const app = express()
 const port = process.env.PORT || 3000;
-dotenv.config({ path: path.resolve("./config/.env") })
+dotenv.config({ path: 'config/.env', debug: false });
 
 // Middleware to parse JSON bodies
 app.use(express.json());
