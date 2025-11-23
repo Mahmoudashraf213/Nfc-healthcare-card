@@ -51,6 +51,16 @@ const patientSchema = new Schema(
       unique: true,
       required: true,
     },
+    surgerys: {
+      type: String,
+      default: [],
+      boolean: false,
+    },
+    ChronicDiseases: {
+      type: String,
+      default: [],
+      boolean: false, 
+    },
   },
   { timestamps: true }
 );
