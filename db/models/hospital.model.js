@@ -1,3 +1,4 @@
+import { required } from "joi";
 import { model, Schema } from "mongoose";
 
 const hospitalSchema = new Schema(
@@ -22,12 +23,21 @@ const hospitalSchema = new Schema(
       lowercase: true,
       unique: true,
     },
+    hotline: {
+      type: String,
+      trim: true,
+      required: true,
+    },
     departments: [
       {
         name: { type: String, trim: true },
         floor: { type: String, trim: true },
       },
     ],
+    licenseNumber: {
+      type: String,
+      trim: true,
+    },
   },
   { timestamps: true }
 );

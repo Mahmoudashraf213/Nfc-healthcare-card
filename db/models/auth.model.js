@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { userRoles } from "../../src/utils/constant/enum";
+import { userRoles } from "../../src/utils/constant/enum.js";
 
 // schema
 const authSchema = new Schema(
