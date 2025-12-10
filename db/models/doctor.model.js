@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { userRoles } from "../../src/utils/constant/enum.js";
 
 const doctorSchema = new Schema(
   {
@@ -27,10 +28,19 @@ const doctorSchema = new Schema(
       lowercase: true,
       unique: true,
     },
+    password: {
+      type: String, // auto-generated and hashed
+      required: true,
+      minlength: 6,
+    },
+    role: {
+      type: String,
+      enum: Object.values(userRoles),
+    },
     hospitalId: {
       type: Schema.Types.ObjectId,
       ref: "Hospital",
-      required: true,
+      // required: true,
     },
     // licenseNumber: {
     //   type: String,
@@ -38,6 +48,10 @@ const doctorSchema = new Schema(
     //   unique: true,
     //   required: true,
     // },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

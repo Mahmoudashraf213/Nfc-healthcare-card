@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import {  bloodTypes,  genderTypes } from "../../src/utils/constant/enum.js";
+import { bloodTypes, genderTypes } from "../../src/utils/constant/enum.js";
 
 // schema
 const patientSchema = new Schema(
@@ -31,7 +31,7 @@ const patientSchema = new Schema(
     },
     bloodType: {
       type: String,
-      enum: Object.values(bloodTypes)
+      enum: Object.values(bloodTypes),
     },
     phoneNumber: {
       type: String,
@@ -49,17 +49,15 @@ const patientSchema = new Schema(
     cardId: {
       type: String,
       unique: true,
-      required: true,
     },
     surgerys: {
-      type: String,
+      type: [String],
       default: [],
-      boolean: false,
     },
+
     ChronicDiseases: {
-      type: String,
+      type: [String], 
       default: [],
-      boolean: false, 
     },
   },
   { timestamps: true }
