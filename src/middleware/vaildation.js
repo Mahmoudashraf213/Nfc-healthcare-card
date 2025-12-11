@@ -44,6 +44,8 @@ export const generalFields = {
     surgerys: joi.array().items(joi.string().trim()).default([]),
     ChronicDiseases: joi.array().items(joi.string().trim()).default([]),
     role : joi.string().trim().valid(...Object.values(roles)),  
+    otp: joi.string().length(6),
+
 };
 export const isValid = (schema) => {
     return (req, res, next) => {

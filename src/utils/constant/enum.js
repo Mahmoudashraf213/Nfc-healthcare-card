@@ -21,4 +21,5 @@ export const roles = Object.freeze({
     ADMIN : "admin",
     SUPER_ADMIN : "super_admin",
     ADMIN_HOSPITAL : "admin_hospital",
+    PATIENT : "patient"
 });

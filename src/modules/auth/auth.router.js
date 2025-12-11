@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { isValid } from "../../middleware/vaildation.js";
-import {  loginDoctorSchema, loginPatientSchema, signupDoctorSchema, signupPatientSchema } from "./auth.validation.js";
+import {  forgetDoctorPasswordSchema, loginDoctorSchema, loginPatientSchema,  resetDoctorPasswordSchema,  signupDoctorSchema, signupPatientSchema, updateDoctorProfileSchema, updatePatientProfileSchema } from "./auth.validation.js";
 import { asyncHandler } from "../../middleware/asyncHandler.js";
-import { getPatientProfile, getProfileDoctor, loginDoctor, loginPatient, signupDoctor, signupPatient, verifyDoctorAccount } from "./auth.controller.js";
+import { forgetPasswordDoctor, getPatientProfile, getProfileDoctor, loginDoctor, loginPatient, signupDoctor, signupPatient, updateDoctorProfile, updatePatientProfile, verifyDoctorAccount, verifyOtpAndResetPasswordDoctor } from "./auth.controller.js";
 import { isAuthenticated } from "../../middleware/authentication.js";
 import { isAuthorized } from "../../middleware/autheraization.js";
 import { roles } from "../../utils/constant/enum.js";
@@ -40,5 +40,33 @@ authRouter.get("/doctor/profile",
     isAuthorized([roles.DOCTOR, roles.ADMIN, roles.SUPER_ADMIN]),
     asyncHandler(getProfileDoctor)
 );
+
+// forget doctor password route
+authRouter.post('/doctor/forget-password',
+    isValid(forgetDoctorPasswordSchema),
+    asyncHandler(forgetPasswordDoctor)
+);
+
+// reset doctor password route
+authRouter.post('/doctor/reset-password',
+    isValid(resetDoctorPasswordSchema),
+    asyncHandler(verifyOtpAndResetPasswordDoctor)
+)
+
+// update patient password route
+authRouter.put('/patient/update',
+    isAuthenticated(),
+    isAuthorized([roles.PATIENT , roles.ADMIN, roles.SUPER_ADMIN , roles.DOCTOR]),
+    isValid(updatePatientProfileSchema),
+    asyncHandler(updatePatientProfile)
+)
+
+// update doctor profile route
+authRouter.put('/doctor/update',
+    isAuthenticated(),
+    isAuthorized([roles.DOCTOR , roles.ADMIN, roles.SUPER_ADMIN]),
+    isValid(updateDoctorProfileSchema),
+    asyncHandler(updateDoctorProfile)
+)
 
 export default authRouter;

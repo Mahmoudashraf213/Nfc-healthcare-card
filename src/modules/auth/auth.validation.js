@@ -1,5 +1,6 @@
 import joi from 'joi';
 import { generalFields } from '../../middleware/vaildation.js';
+import e from 'express';
 
 
 // patient signup validation
@@ -41,3 +42,40 @@ export const loginDoctorSchema = joi.object({
     password : generalFields.password.required(),
 })
 
+// forget doctor password validation
+export const forgetDoctorPasswordSchema = joi.object({
+email : generalFields.email.required(),
+})
+
+// reset doctor password validation
+export const resetDoctorPasswordSchema = joi.object({
+    email : generalFields.email.required(),
+    otp : generalFields.otp.required(),
+    newPassword : generalFields.password.required(),
+})
+
+// update patient profile validation
+export const updatePatientProfileSchema = joi.object({
+    firstName : generalFields.name.optional(),
+    lastName : generalFields.name.optional(),
+    nationalId : generalFields.nationalId.optional(),
+    gender : generalFields.gender.optional(),
+    dateOfBirth : generalFields.dateOfBirth.optional(),
+    bloodType : generalFields.bloodType.optional(),
+    phoneNumber : generalFields.phoneNumber.optional(),
+    address : generalFields.address.optional(),
+    emergencyContact : generalFields.emergencyContact.optional(),
+    cardId : generalFields.cardId.optional(),
+    surgerys : generalFields.surgerys.optional(),
+    ChronicDiseases : generalFields.ChronicDiseases.optional(),
+}) 
+
+
+// update doctor profile validation
+export const updateDoctorProfileSchema = joi.object({
+    firstName : generalFields.name.optional(),
+    lastName : generalFields.name.optional(),
+    specialization : generalFields.specialization.optional(),
+    phoneNumber : generalFields.phoneNumber.optional(),
+    hospitalId : generalFields.objectId.optional(),
+})

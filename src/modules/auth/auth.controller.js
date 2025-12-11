@@ -5,6 +5,7 @@ import { generateToken, verifyToken } from '../../utils/token.js';
 import { Doctor, Patient } from '../../../db/index.js';
 import { roles } from '../../utils/constant/enum.js';
 import { sendEmail } from '../../utils/sendEmail.js';
+import { generateOTP, sendOTP } from '../../utils/OTP.js';
 
 
 
@@ -34,7 +35,8 @@ export const signupPatient = async (req, res, next) => {
     emergencyContact,
     cardId,
     surgerys,
-    ChronicDiseases
+    ChronicDiseases,
+    role : roles.PATIENT,
   });
 
   // save patient
@@ -252,3 +254,188 @@ export const getProfileDoctor = async (req, res, next) => {
     data: doctorExist
   })
 }
+
+// Forget Password (Doctor)
+export const forgetPasswordDoctor = async (req, res, next) => {
+    const { email } = req.body;
+
+    // check existence
+    const doctorExist = await Doctor.findOne({ email });
+    if (!doctorExist) {
+        return next(new AppError(messages.doctor.notExist, 401));
+    }
+
+    // generate OTP
+    const otp = generateOTP();
+
+    //  SEND EMAIL WITH OTP
+    await sendOTP(doctorExist.email, otp);
+
+    // save OTP + expiry
+    doctorExist.otp = otp;
+    doctorExist.otpExpires = Date.now() + 10 * 60 * 1000;
+
+    const saved = await doctorExist.save();
+    if (!saved) {
+        return next(new AppError(messages.doctor.failToUpdate, 500));
+    }
+
+    return res.status(200).json({
+        message: messages.doctor.otpSent,
+        success: true,
+    });
+};
+
+// Verify OTP & Reset Password (Doctor)
+export const verifyOtpAndResetPasswordDoctor = async (req, res, next) => {
+    const { email, otp, newPassword } = req.body;
+
+    // find doctor (include password)
+    const doctor = await Doctor.findOne({ email }).select("+password");
+    if (!doctor) {
+        return next(new AppError(messages.doctor.notExist, 404));
+    }
+
+    // convert otp to string to avoid mismatch (fixes most errors)
+    const storedOtp = String(doctor.otp);
+    const enteredOtp = String(otp);
+
+    // check otp validity
+    if (storedOtp !== enteredOtp || Date.now() > doctor.otpExpires) {
+        return next(new AppError(messages.doctor.invalidOTP, 400));
+    }
+
+    // check new password is not same as old
+    const isSame = await bcrypt.compare(newPassword, doctor.password);
+    if (isSame) {
+        return next(new AppError(messages.doctor.samePassword, 400));
+    }
+
+    // hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // update doctor password + clear otp
+    doctor.password = hashedPassword;
+    doctor.otp = undefined;
+    doctor.otpExpires = undefined;
+
+    const updated = await doctor.save();
+    if (!updated) {
+        return next(new AppError(messages.doctor.failToUpdate, 400));
+    }
+
+    return res.status(200).json({
+        message: messages.doctor.passwordUpdated,
+        success: true
+    });
+};
+
+
+// Update Patient Profile
+export const updatePatientProfile = async (req, res, next) => {
+  const patientId = req.authUser._id; // patient from auth middleware
+  const {
+    firstName,
+    lastName,
+    nationalId,
+    gender,
+    dateOfBirth,
+    bloodType,
+    phoneNumber,
+    address,
+    emergencyContact,
+    cardId,
+    surgerys,
+    ChronicDiseases
+  } = req.body;
+
+  // Find patient
+  const patient = await Patient.findById(patientId);
+  if (!patient) {
+    return next(new AppError(messages.patient.notExist, 404));
+  }
+
+  // Check if nationalId is changed → must not duplicate
+  if (nationalId && nationalId !== patient.nationalId) {
+    const idExists = await Patient.findOne({ nationalId });
+    if (idExists) {
+      return next(new AppError(messages.patient.nationalIdTaken, 409));
+    }
+    patient.nationalId = nationalId;
+  }
+
+  // Check if cardId is changed → must not duplicate
+  if (cardId && cardId !== patient.cardId) {
+    const cardExists = await Patient.findOne({ cardId });
+    if (cardExists) {
+      return next(new AppError(messages.patient.cardIdTaken, 409));
+    }
+    patient.cardId = cardId;
+  }
+
+  // UPDATE NORMAL FIELDS
+  if (firstName) patient.firstName = firstName;
+  if (lastName) patient.lastName = lastName;
+  if (gender) patient.gender = gender;
+  if (dateOfBirth) patient.dateOfBirth = dateOfBirth;
+  if (bloodType) patient.bloodType = bloodType;
+  if (phoneNumber) patient.phoneNumber = phoneNumber;
+  if (address) patient.address = address;
+
+  // UPDATE emergencyContact (nested object) 
+  if (emergencyContact) {
+    patient.emergencyContact = {
+      name: emergencyContact.name || patient.emergencyContact?.name,
+      phone: emergencyContact.phone || patient.emergencyContact?.phone,
+      relation: emergencyContact.relation || patient.emergencyContact?.relation,
+    };
+  }
+
+  // UPDATE ARRAYS 
+  if (surgerys) patient.surgerys = surgerys; // must be an array
+  if (ChronicDiseases) patient.ChronicDiseases = ChronicDiseases; // must be an array
+
+  // SAVE 
+  const updatedPatient = await patient.save();
+  if (!updatedPatient) {
+    return next(new AppError(messages.patient.failToUpdate, 500));
+  }
+  // SEND RESPONSE
+  return res.status(200).json({
+    message: messages.patient.updated,
+    success: true,
+    data: updatedPatient,
+  });
+};
+
+
+// Update Doctor Profile 
+export const updateDoctorProfile = async (req, res, next) => {
+  const doctorId = req.authUser._id; // doctor from auth middleware
+  const { firstName, lastName, specialization, phoneNumber, hospitalId } = req.body;
+
+  // Find doctor
+  const doctor = await Doctor.findById(doctorId);
+  if (!doctor) {
+    return next(new AppError(messages.doctor.notExist, 404));
+  }
+
+  // Update allowed fields
+  if (firstName) doctor.firstName = firstName;
+  if (lastName) doctor.lastName = lastName;
+  if (specialization) doctor.specialization = specialization;
+  if (phoneNumber) doctor.phoneNumber = phoneNumber;
+  if (hospitalId) doctor.hospitalId = hospitalId;
+
+  // Save changes
+  const updatedDoctor = await doctor.save();
+  if (!updatedDoctor) {
+    return next(new AppError(messages.doctor.failToUpdate, 500));
+  }
+
+  return res.status(200).json({
+    message: messages.doctor.updated,
+    success: true,
+    data: updatedDoctor,
+  });
+};

@@ -29,7 +29,7 @@ const doctorSchema = new Schema(
       unique: true,
     },
     password: {
-      type: String, // auto-generated and hashed
+      type: String, 
       required: true,
       minlength: 6,
     },
@@ -52,6 +52,9 @@ const doctorSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    otp: String,
+    otpExpires: String,
+
   },
   { timestamps: true }
 );

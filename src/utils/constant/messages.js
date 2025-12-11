@@ -17,11 +17,19 @@ export const messages = {
         ...generateMessage('Patient'),
         loginSuccessfully: 'Patient logged in successfully',
         accountCreated: 'Patient account created successfully',
+        passwordReset: 'Patient password reset successfully',
+        cardIdTaken: 'Card ID is already taken',
+        nationalIdTaken: 'National ID is already taken',
     },
     doctor: {
         ...generateMessage('Doctor'),
         accountCreated: 'Doctor account created successfully',
         loginSuccessfully: 'Doctor logged in successfully',
+        otpSent: 'OTP has been sent to your email',
+        invalidOTP: 'The provided OTP is invalid or has expired',
+        samePassword: 'The new password cannot be the same as the old password',
+        passwordUpdated: 'Doctor password updated successfully',
+        emailTaken: 'Email is already taken',
 
     },
     user :{
