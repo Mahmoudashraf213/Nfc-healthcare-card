@@ -29,7 +29,11 @@ export const messages = {
         invalidToken: 'Invalid token provided',
         notVerified: 'User account is not verified',
         invalidCredentials: 'Invalid credentials provided',
-
+        loginSuccess: 'User logged in successfully',
+        passwordInvalid: 'Invalid password provided',
+    },
+    admin :{
+        ...generateMessage('Admin'),
     }
 
 }

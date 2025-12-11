@@ -3,7 +3,7 @@ import { AppError } from '../../utils/appError.js';
 import { messages } from '../../utils/constant/messages.js';
 import { generateToken, verifyToken } from '../../utils/token.js';
 import { Doctor, Patient } from '../../../db/index.js';
-import { userRoles } from '../../utils/constant/enum.js';
+import { roles } from '../../utils/constant/enum.js';
 import { sendEmail } from '../../utils/sendEmail.js';
 
 
@@ -70,10 +70,9 @@ export const loginPatient = async (req, res, next) => {
     return next(new AppError(messages.patient.notExist, 404));
   }
 
-  // No password check → login is based only on nationalId
-  // Generate token (ONLY nationalId)
+  // Generate token with _id (standard auth expects payload._id)
   const token = generateToken({
-    payload: { nationalId: patient.nationalId }
+    payload: { _id: patient._id, nationalId: patient.nationalId }
   });
 
   // Send response
@@ -116,7 +115,7 @@ export const signupDoctor = async (req, res, next) => {
     phoneNumber,
     email,
     password: hashedPassword,
-    role: userRoles.DOCTOR,
+    role: roles.DOCTOR,
     hospitalId
   });
 
@@ -208,7 +207,7 @@ export const loginDoctor = async (req, res, next) => {
 
   // Generate token
   const token = generateToken({
-    payload: { _id: doctor._id, email: doctor.email, role: userRoles.DOCTOR },
+    payload: { _id: doctor._id, email: doctor.email, role: roles.DOCTOR },
   });
 
   // Send response
@@ -218,3 +217,38 @@ export const loginDoctor = async (req, res, next) => {
     token,
   });
 };
+
+
+// get profile patient
+export const getPatientProfile = async (req, res, next) => {
+  // get data from req
+  const patient = req.authUser._id;
+  // check existence
+  const patientExist = await Patient.findById(patient)
+  if (!patientExist) {
+    return next(new AppError(messages.patient.notExist, 404))
+  }
+  // send res 
+  return res.status(200).json({
+    message: messages.patient.fetchedSuccessfully,
+    success: true,
+    data: patientExist
+  })
+}
+
+// get profile doctor
+export const getProfileDoctor = async (req, res, next) => {
+  // get data from req
+  const doctor = req.authUser._id;
+  // check existence
+  const doctorExist = await Doctor.findById(doctor)
+  if (!doctorExist) {
+    return next(new AppError(messages.doctor.notExist, 404))
+  }
+  // send res 
+  return res.status(200).json({
+    message: messages.doctor.fetchedSuccessfully,
+    success: true,
+    data: doctorExist
+  })
+}

@@ -1,12 +1,14 @@
 // import modules
 import joi from 'joi';
 import { AppError } from '../utils/appError.js';
-import { bloodTypes, genderTypes, userRoles } from '../utils/constant/enum.js';
+import { bloodTypes, genderTypes, roles } from '../utils/constant/enum.js';
 
 export const generalFields = {
     name: joi.string(),
     email: joi.string().email(),
-    password: joi.string().pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)),
+    password: joi.string().pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)).messages({
+      "string.pattern.base": "Password is invalid", // custom message
+    }),
     specialization: joi.string(),
     phoneNumber: joi.string().pattern(new RegExp(/^01[0-2,5]{1}[0-9]{8}$/)),
     address: joi.string(),
@@ -41,7 +43,7 @@ export const generalFields = {
     cardId: joi.string().trim(),
     surgerys: joi.array().items(joi.string().trim()).default([]),
     ChronicDiseases: joi.array().items(joi.string().trim()).default([]),
-    role : joi.string().trim().valid(...Object.values(userRoles)),  
+    role : joi.string().trim().valid(...Object.values(roles)),  
 };
 export const isValid = (schema) => {
     return (req, res, next) => {

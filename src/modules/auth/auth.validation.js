@@ -40,3 +40,4 @@ export const loginDoctorSchema = joi.object({
     email : generalFields.email.required(),
     password : generalFields.password.required(),
 })
+

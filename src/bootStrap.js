@@ -1,6 +1,6 @@
 import cors from "cors";
 import { globalErrorHandling } from "./utils/appError.js";
-import { authRouter } from "./modules/index.js";
+import { adminRouter, authRouter } from "./modules/index.js";
 
 export const bootStrap = (app, express) => {
   // parse req
@@ -14,6 +14,7 @@ export const bootStrap = (app, express) => {
   app.use(cors(corsOptions));
   // routes
   app.use("/auth", authRouter);
+  app.use("/admin" , adminRouter)
   // global error
   app.use(globalErrorHandling);
 };

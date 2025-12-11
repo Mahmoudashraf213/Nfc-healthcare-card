@@ -1,10 +1,10 @@
 import { model, Schema } from "mongoose";
-import { userRoles } from "../../src/utils/constant/enum.js";
+import { roles } from "../../src/utils/constant/enum.js";
 
 // schema
-const authSchema = new Schema(
+const userSchema = new Schema(
   {
-    name: {
+    fullName: {
       type: String, // used as username for login
       trim: true,
       required: true,
@@ -23,7 +23,7 @@ const authSchema = new Schema(
     },
     role: {
       type: String,
-      enum: Object.values(userRoles),
+      enum: Object.values(roles),
       required: true,
     },
     // if doctor
@@ -50,9 +50,13 @@ const authSchema = new Schema(
       type: String,
       trim: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
 // model
-export const Auth = model("Auth", authSchema);
+export const User = model("User", userSchema);

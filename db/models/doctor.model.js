@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { userRoles } from "../../src/utils/constant/enum.js";
+import { roles } from "../../src/utils/constant/enum.js";
 
 const doctorSchema = new Schema(
   {
@@ -35,8 +35,8 @@ const doctorSchema = new Schema(
     },
     role: {
       type: String,
-      enum: Object.values(userRoles),
-    },
+      enum: Object.values(roles),
+     },
     hospitalId: {
       type: Schema.Types.ObjectId,
       ref: "Hospital",

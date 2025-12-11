@@ -15,8 +15,10 @@ export const bloodTypes= Object.freeze({
 })
 
 
-export const userRoles = Object.freeze({
+export const roles = Object.freeze({
     DOCTOR : "doctor",
     HOSPITAL : "hospital",
-    ADMIN : "admin"
+    ADMIN : "admin",
+    SUPER_ADMIN : "super_admin",
+    ADMIN_HOSPITAL : "admin_hospital",
 });
