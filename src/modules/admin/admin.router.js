@@ -12,10 +12,10 @@ const adminRouter = Router();
 
 
 // signup super admin route
-adminRouter.post("/signup/super-admin",
-    isValid(signupSuperAdminSchema),
-    asyncHandler(signupSuperAdmin)
-);
+// adminRouter.post("/signup/super-admin",
+//     isValid(signupSuperAdminSchema),
+//     asyncHandler(signupSuperAdmin)
+// );
 
 // login super admin route
 adminRouter.post("/login/super-admin",

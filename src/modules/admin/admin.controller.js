@@ -5,44 +5,46 @@ import { roles } from "../../utils/constant/enum.js";
 import { User } from "../../../db/index.js";
 import { generateToken } from "../../utils/token.js";
 
-// Signup Super Admin
-export const signupSuperAdmin = async (req, res, next) => {
-  const { fullName, email, password, phoneNumber } = req.body;
+// // Signup Super Admin
+// export const signupSuperAdmin = async (req, res, next) => {
+//   const { fullName, email, password, phoneNumber } = req.body;
 
-  // Check if email or fullName exists
-  const existingUser = await User.findOne({ $or: [{ email }, { fullName }] });
-  if (existingUser) {
-    return next(new AppError(messages.user.alreadyExist, 400));
-  }
+//   // Check if email or fullName exists
+//   const existingUser = await User.findOne({ $or: [{ email }, { fullName }] });
+//   if (existingUser) {
+//     return next(new AppError(messages.user.alreadyExist, 400));
+//   }
 
-  // Optional: check password manually
-  if (!password || password.length < 6) {
-    return next(new AppError(messages.user.passwordInvalid, 400));
-  }
+//   // Optional: check password manually
+//   if (!password || password.length < 6) {
+//     return next(new AppError(messages.user.passwordInvalid, 400));
+//   }
 
-  const hashedPassword = bcrypt.hashSync(password, 8);
+//   const hashedPassword = bcrypt.hashSync(password, 8);
 
-  // Create SUPER_ADMIN
-  const superAdmin = new User({
-    fullName,
-    email,
-    password: hashedPassword,
-    phoneNumber,
-    role: roles.SUPER_ADMIN,
-    isVerified: true
-  });
+//   // Create SUPER_ADMIN
+//   const superAdmin = new User({
+//     fullName,
+//     email,
+//     password: hashedPassword,
+//     phoneNumber,
+//     role: roles.SUPER_ADMIN,
+//     isVerified: true
+//   });
 
-  const savedAdmin = await superAdmin.save();
-  if (!savedAdmin) {
-    return next(new AppError(messages.user.failToCreate, 500));
-  }
+//   const savedAdmin = await superAdmin.save();
+//   if (!savedAdmin) {
+//     return next(new AppError(messages.user.failToCreate, 500));
+//   }
 
-  res.status(201).json({
-    message: messages.user.created,
-    success: true,
-    data: savedAdmin
-  });
-};
+//   res.status(201).json({
+//     message: messages.user.created,
+//     success: true,
+//     data: savedAdmin
+//   });
+// };
+
+
 
 // Login Super Admin
 export const loginSuperAdmin = async (req, res, next) => {
