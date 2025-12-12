@@ -28,3 +28,9 @@ export const loginAdminSchema = joi.object({
     email : generalFields.email.required(),
     password : generalFields.password.required(),
 });
+
+
+// delete admin validation
+export const deleteAdminSchema = joi.object({
+    adminId : generalFields.objectId.required(),
+});

@@ -152,3 +152,30 @@ export const getAllAdmin = async (req, res, next) => {
   });
 };
 
+// Delete Admin by ID
+export const deleteAdminById = async (req, res, next) => {
+  const { adminId } = req.params; //  adminId instead of id
+
+  // Find admin by ID
+  const admin = await User.findOne({ _id: adminId });
+  if (!admin) {
+    return next(new AppError(messages.admin.notExist, 404));
+  }
+
+  // Prevent deleting SUPER_ADMIN
+  if (admin.role === roles.SUPER_ADMIN) {
+    return next(new AppError(messages.admin.cannotDeleteSuperAdmin, 403));
+  }
+
+  // Only admins can be deleted
+  if (admin.role !== roles.ADMIN) {
+    return next(new AppError(messages.admin.canOnlyDeleteAdmins, 403));
+  }
+
+  await User.deleteOne({ _id: adminId });
+
+  return res.status(200).json({
+    message: messages.admin.deletedSuccessfully,
+    success: true,
+  });
+};

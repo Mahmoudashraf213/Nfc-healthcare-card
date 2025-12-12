@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { isValid } from "../../middleware/vaildation.js";
-import { createAdminSchema, loginAdminSchema, loginSuperAdminSchema, signupSuperAdminSchema } from "./admin.validation.js";
+import { createAdminSchema, deleteAdminSchema, loginAdminSchema, loginSuperAdminSchema, signupSuperAdminSchema } from "./admin.validation.js";
 import { isAuthenticated } from "../../middleware/authentication.js";
 import { isAuthorized } from "../../middleware/autheraization.js";
 import { roles } from "../../utils/constant/enum.js";
 import { asyncHandler } from "../../middleware/asyncHandler.js";
-import { createAdmin, getAllAdmin,  loginAdmin, loginSuperAdmin, signupSuperAdmin } from "./admin.controller.js";
+import { createAdmin, deleteAdminById, getAllAdmin,  loginAdmin, loginSuperAdmin, signupSuperAdmin } from "./admin.controller.js";
 
 
 const adminRouter = Router();
@@ -44,5 +44,13 @@ adminRouter.get("/admins",
     asyncHandler(getAllAdmin)
 )
 
+
+// delete admin route
+adminRouter.delete("/admin/:adminId",
+    isAuthenticated(),
+    isAuthorized([roles.SUPER_ADMIN]),
+    isValid(deleteAdminSchema),
+    asyncHandler(deleteAdminById)
+)
 
 export default adminRouter;

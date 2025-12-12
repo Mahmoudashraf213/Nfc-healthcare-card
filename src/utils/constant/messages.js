@@ -42,6 +42,9 @@ export const messages = {
     },
     admin :{
         ...generateMessage('Admin'),
+        deletedSuccessfully: 'Admin deleted successfully',
+        cannotDeleteSuperAdmin: 'You cannot delete a SUPER_ADMIN',
+        canOnlyDeleteAdmins: 'You can only delete admins',
     }
 
 }
