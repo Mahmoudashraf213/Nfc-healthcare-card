@@ -1,6 +1,5 @@
 import joi from 'joi';
 import { generalFields } from '../../middleware/vaildation.js';
-import e from 'express';
 
 
 // patient signup validation
@@ -32,7 +31,7 @@ export const signupDoctorSchema = joi.object({
     email : generalFields.email.required(),
     phoneNumber : generalFields.phoneNumber.required(),
     password : generalFields.password.required(),
-    hospitalId : generalFields.objectId.optional(),
+    hospitalId : generalFields.objectId.required(),
     role : generalFields.role.optional(),
 })
 

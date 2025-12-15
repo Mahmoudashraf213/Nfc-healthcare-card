@@ -34,3 +34,19 @@ export const loginAdminSchema = joi.object({
 export const deleteAdminSchema = joi.object({
     adminId : generalFields.objectId.required(),
 });
+
+// create hospital admin validation
+export const createHospitalAdminSchema = joi.object({
+    fullName : generalFields.name.required(),
+    email : generalFields.email.required(),
+    password : generalFields.password.required(),
+    phoneNumber : generalFields.phoneNumber.required(),
+    hospitalId : generalFields.objectId.required(),
+})
+
+
+// logon hospital admin validation
+export const loginHospitalAdminSchema = joi.object({
+    email : generalFields.email.required(),
+    password : generalFields.password.required(),
+});

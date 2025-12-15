@@ -181,3 +181,89 @@ export const deleteAdminById = async (req, res, next) => {
     success: true,
   });
 };
+
+// Create Hospital Admin (SUPER_ADMIN or ADMIN only)
+export const createAdminHospital = async (req, res, next) => {
+  const { fullName, email, phoneNumber, password, hospitalId } = req.body;
+
+  // Creator from auth middleware
+  const creator = req.authUser;
+
+  // Only SUPER_ADMIN or ADMIN can create hospital admins
+  if (![roles.SUPER_ADMIN, roles.ADMIN].includes(creator.role)) {
+    return next(new AppError(messages.user.cannotCreateAdminHospital, 403));
+  }
+
+  // Check if admin already exists
+  const existing = await User.findOne({ $or: [{ email }, { fullName }] });
+  if (existing) {
+    return next(new AppError(messages.user.alreadyExist, 409));
+  }
+
+  // Hash password
+  const hashedPassword = bcrypt.hashSync(password, 8);
+
+  // Create hospital admin
+  const adminHospital = new User({
+    fullName,
+    email,
+    phoneNumber,
+    password: hashedPassword,
+    role: roles.ADMIN_HOSPITAL,
+    hospitalId,  // link to a hospital
+    isVerified: true,
+  });
+
+  const created = await adminHospital.save();
+  if (!created) {
+    return next(new AppError(messages.user.failToCreate, 500));
+  }
+
+  // Hide password
+  created.password = undefined;
+
+  return res.status(201).json({
+    message: messages.user.created, 
+    success: true,
+    data: created,
+  });
+};
+
+
+// Hospital Admin Login
+export const loginHospitalAdmin = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // Find the user with role ADMIN_HOSPITAL and verified
+  const adminHospital = await User.findOne({
+    email,
+    role: roles.ADMIN_HOSPITAL,
+    isVerified: true,
+  });
+
+  if (!adminHospital) {
+    return next(new AppError(messages.user.notExist, 404));
+  }
+
+  // Compare password
+  const isPasswordValid = bcrypt.compareSync(password, adminHospital.password);
+  if (!isPasswordValid) {
+    return next(new AppError(messages.user.passwordInvalid, 400));
+  }
+
+  // Generate token
+  const token = generateToken({
+    payload: { _id: adminHospital._id, role: adminHospital.role },
+  });
+
+  // Hide password in response
+  adminHospital.password = undefined;
+
+  // Send response
+  res.status(200).json({
+    message: messages.user.loginSuccess,
+    success: true,
+    token,
+  });
+};
+

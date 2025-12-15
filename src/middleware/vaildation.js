@@ -6,9 +6,7 @@ import { bloodTypes, genderTypes, roles } from '../utils/constant/enum.js';
 export const generalFields = {
     name: joi.string(),
     email: joi.string().email(),
-    password: joi.string().pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)).messages({
-      "string.pattern.base": "Password is invalid", // custom message
-    }),
+    password: joi.string().pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)),
     specialization: joi.string(),
     phoneNumber: joi.string().pattern(new RegExp(/^01[0-2,5]{1}[0-9]{8}$/)),
     address: joi.string(),

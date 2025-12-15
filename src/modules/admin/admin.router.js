@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { isValid } from "../../middleware/vaildation.js";
-import { createAdminSchema, deleteAdminSchema, loginAdminSchema, loginSuperAdminSchema, signupSuperAdminSchema } from "./admin.validation.js";
+import { createAdminSchema, createHospitalAdminSchema, deleteAdminSchema, loginAdminSchema, loginHospitalAdminSchema, loginSuperAdminSchema } from "./admin.validation.js";
 import { isAuthenticated } from "../../middleware/authentication.js";
 import { isAuthorized } from "../../middleware/autheraization.js";
 import { roles } from "../../utils/constant/enum.js";
 import { asyncHandler } from "../../middleware/asyncHandler.js";
-import { createAdmin, deleteAdminById, getAllAdmin,  loginAdmin, loginSuperAdmin, signupSuperAdmin } from "./admin.controller.js";
+import { createAdmin, createAdminHospital, deleteAdminById, getAllAdmin,  loginAdmin, loginHospitalAdmin, loginSuperAdmin } from "./admin.controller.js";
 
 
 const adminRouter = Router();
@@ -53,4 +53,18 @@ adminRouter.delete("/admin/:adminId",
     asyncHandler(deleteAdminById)
 )
 
+// create hospital admin route
+adminRouter.post("/create-hospital-admin",
+    isAuthenticated(),
+    isAuthorized([roles.SUPER_ADMIN , roles.ADMIN]),
+    isValid(createHospitalAdminSchema),
+    asyncHandler(createAdminHospital)
+);
+
+
+// login hospital admin route
+adminRouter.post("/login/hospital-admin",
+    isValid(loginHospitalAdminSchema),
+    asyncHandler(loginHospitalAdmin)
+)
 export default adminRouter;

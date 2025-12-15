@@ -40,7 +40,7 @@ const doctorSchema = new Schema(
     hospitalId: {
       type: Schema.Types.ObjectId,
       ref: "Hospital",
-      // required: true,
+      required: true,
     },
     // licenseNumber: {
     //   type: String,

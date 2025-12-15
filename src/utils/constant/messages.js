@@ -39,12 +39,19 @@ export const messages = {
         invalidCredentials: 'Invalid credentials provided',
         loginSuccess: 'User logged in successfully',
         passwordInvalid: 'Invalid password provided',
+        unauthorized: 'You are not authorized to perform this action',
+        cannotCreateAdminHospital: 'Only SUPER_ADMIN or ADMIN can create hospital admins',
     },
     admin :{
         ...generateMessage('Admin'),
         deletedSuccessfully: 'Admin deleted successfully',
         cannotDeleteSuperAdmin: 'You cannot delete a SUPER_ADMIN',
         canOnlyDeleteAdmins: 'You can only delete admins',
-    }
+    },
+    hospital :{
+        ...generateMessage('Hospital'),
+        emailTaken: 'Email is already taken',
+        nameTaken: 'Hospital name is already taken',
+    },
 
 }
