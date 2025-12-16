@@ -36,7 +36,7 @@ export const signupDoctorSchema = joi.object({
 })
 
 // doctor login validation
-export const loginDoctorSchema = joi.object({
+export const loginSchema = joi.object({
     email : generalFields.email.required(),
     password : generalFields.password.required(),
 })

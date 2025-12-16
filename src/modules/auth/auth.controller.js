@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { AppError } from '../../utils/appError.js';
 import { messages } from '../../utils/constant/messages.js';
 import { generateToken, verifyToken } from '../../utils/token.js';
-import { Doctor, Patient } from '../../../db/index.js';
+import { Doctor, Patient, User } from '../../../db/index.js';
 import { roles } from '../../utils/constant/enum.js';
 import { sendEmail } from '../../utils/sendEmail.js';
 import { generateOTP, sendOTP } from '../../utils/OTP.js';
@@ -186,35 +186,42 @@ export const verifyDoctorAccount = async (req, res, next) => {
   `);
 };
 
-// doctor login
-export const loginDoctor = async (req, res, next) => {
+// LOGIN 
+export const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  // Find doctor by email
-  const doctor = await Doctor.findOne({ email: email.toLowerCase() });
-  if (!doctor) {
-    return next(new AppError(messages.user.notExist, 404));
+  //  Check user existence (include password)
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    return next(new AppError(messages.user.invalidCredentials, 401));
   }
 
-  // Check password
-  const isPasswordValid = bcrypt.compareSync(password, doctor.password);
+  //  Check password
+  const isPasswordValid = bcrypt.compareSync(password, user.password);
   if (!isPasswordValid) {
-    return next(new AppError(messages.user.invalidCredentials, 400));
+    return next(new AppError(messages.user.invalidCredentials, 401));
   }
 
-  // Check if verified
-  if (!doctor.isVerified) {
+  //  Check verification status (if required)
+  if (user.isVerified === false) {
     return next(new AppError(messages.user.notVerified, 403));
   }
 
-  // Generate token
+  //  Generate token (include role + hospitalId)
   const token = generateToken({
-    payload: { _id: doctor._id, email: doctor.email, role: roles.DOCTOR },
+    payload: {
+      _id: user._id,
+      role: user.role,
+      hospitalId: user.hospitalId || null,
+    },
   });
 
-  // Send response
+  //  Hide password
+  user.password = undefined;
+
+  //  Send response
   return res.status(200).json({
-    message: messages.doctor.loginSuccessfully,
+    message: messages.user.loginSuccess,
     success: true,
     token,
   });

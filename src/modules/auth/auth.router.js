@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { isValid } from "../../middleware/vaildation.js";
-import {  forgetDoctorPasswordSchema, loginDoctorSchema, loginPatientSchema,  resetDoctorPasswordSchema,  signupDoctorSchema, signupPatientSchema, updateDoctorProfileSchema, updatePatientProfileSchema } from "./auth.validation.js";
+import {  forgetDoctorPasswordSchema, loginPatientSchema,  loginSchema,  resetDoctorPasswordSchema,  signupDoctorSchema, signupPatientSchema, updateDoctorProfileSchema, updatePatientProfileSchema } from "./auth.validation.js";
 import { asyncHandler } from "../../middleware/asyncHandler.js";
-import { forgetPasswordDoctor, getPatientProfile, getProfileDoctor, loginDoctor, loginPatient, signupDoctor, signupPatient, updateDoctorProfile, updatePatientProfile, verifyDoctorAccount, verifyOtpAndResetPasswordDoctor } from "./auth.controller.js";
+import { forgetPasswordDoctor, getPatientProfile, getProfileDoctor, login, loginPatient, signupDoctor, signupPatient, updateDoctorProfile, updatePatientProfile, verifyDoctorAccount, verifyOtpAndResetPasswordDoctor } from "./auth.controller.js";
 import { isAuthenticated } from "../../middleware/authentication.js";
 import { isAuthorized } from "../../middleware/autheraization.js";
 import { roles } from "../../utils/constant/enum.js";
@@ -25,7 +25,7 @@ authRouter.post('/signup/doctor', isValid(signupDoctorSchema), asyncHandler(sign
 authRouter.get('/verify/:token', asyncHandler(verifyDoctorAccount))
 
 // doctor login route
-authRouter.post('/login/doctor', isValid(loginDoctorSchema) , asyncHandler(loginDoctor));
+authRouter.post('/login', isValid(loginSchema) , asyncHandler(login));
 
 // get patient profile route
 authRouter.get('/patient/profile',

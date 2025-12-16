@@ -11,8 +11,11 @@ export const receptionistHospitalSchema = joi.object({
 })
 
 
-// receptionist login validation
-export const loginReceptionistSchema = joi.object({
-    email : generalFields.email.required(),
-    password : generalFields.password.required(),
+// update receptionist validation
+export const updateReceptionistSchema = joi.object({
+    receptionistId : generalFields.objectId.required(),
+    fullName : generalFields.name.optional(),
+    email : generalFields.email.optional(),
+    phoneNumber : generalFields.phoneNumber.optional(),
+    password : generalFields.password.optional(),
 })

@@ -54,31 +54,89 @@ export const createReceptionist = async (req, res, next) => {
   });
 };
 
-// Receptionist login
-export const loginReceptionist = async (req, res, next) => {
-  const { email, password } = req.body;
 
-  // Find user with role RECEPTIONIST
-  const receptionist = await User.findOne({ email, role: roles.RECEPTIONIST, isVerified: true });
+// Update ReceptionIST (ADMIN_HOSPITAL only)
+export const updateReceptionist = async (req, res, next) => {
+  const { receptionistId } = req.params;
+  const { fullName, email, phoneNumber, password } = req.body;
+
+  // logged-in user
+  const adminHospital = req.authUser;
+
+  // role check (extra safety)
+  if (adminHospital.role !== roles.ADMIN_HOSPITAL) {
+    return next(new AppError(messages.user.unauthorized, 403));
+  }
+
+  // find receptionist
+  const receptionist = await User.findOne({
+    _id: receptionistId,
+    role: roles.RECEPTIONIST,
+    hospitalId: adminHospital.hospitalId,
+  });
+
   if (!receptionist) {
     return next(new AppError(messages.user.notExist, 404));
   }
 
-  // Check password
-  const isPasswordValid = await bcrypt.compare(password, receptionist.password);
-  if (!isPasswordValid) {
-    return next(new AppError(messages.user.passwordInvalid, 400));
+  // check duplicate email
+  if (email && email !== receptionist.email) {
+    const emailExist = await User.findOne({ email });
+    if (emailExist) {
+      return next(new AppError(messages.user.emailTaken, 409));
+    }
+    receptionist.email = email;
   }
 
-  // Generate JWT token
-  const token = generateToken({ payload: { _id: receptionist._id, role: receptionist.role } });
+  // update fields
+  if (fullName) receptionist.fullName = fullName;
+  if (phoneNumber) receptionist.phoneNumber = phoneNumber;
 
-  // Hide password in response
-  receptionist.password = undefined;
+  // update password (optional)
+  if (password) {
+    receptionist.password = bcrypt.hashSync(password, 8);
+  }
+
+  // save
+  const updated = await receptionist.save();
+  if (!updated) {
+    return next(new AppError(messages.user.failToUpdate, 500));
+  }
+
+  // hide password
+  updated.password = undefined;
 
   return res.status(200).json({
-    message: messages.user.loginSuccess,
+    message: messages.user.updated,
     success: true,
-    token,
+    data: updated,
+  });
+};
+
+
+// Get all receptionists (ADMIN_HOSPITAL only)
+export const getAllReceptionists = async (req, res, next) => {
+  const adminHospital = req.authUser;
+
+  // Ensure admin hospital has hospitalId
+  if (!adminHospital.hospitalId) {
+    return next(new AppError(messages.hospital.notExist, 404));
+  }
+
+  // Fetch receptionists for same hospital
+  const receptionists = await User.find({
+    role: roles.RECEPTIONIST,
+    hospitalId: adminHospital.hospitalId,
+  }).select("-password");
+
+  if (!receptionists.length) {
+    return next(new AppError(messages.user.notExist, 404));
+  }
+
+  return res.status(200).json({
+    message: messages.user.fetchedSuccessfully,
+    success: true,
+    count: receptionists.length,
+    data: receptionists,
   });
 };

@@ -41,6 +41,7 @@ export const messages = {
         passwordInvalid: 'Invalid password provided',
         unauthorized: 'You are not authorized to perform this action',
         cannotCreateAdminHospital: 'Only SUPER_ADMIN or ADMIN can create hospital admins',
+        emailTaken: 'Email is already taken',
     },
     admin :{
         ...generateMessage('Admin'),

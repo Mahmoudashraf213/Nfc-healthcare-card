@@ -3,9 +3,9 @@ import { isAuthenticated } from "../../middleware/authentication.js";
 import { isAuthorized } from "../../middleware/autheraization.js";
 import { roles } from "../../utils/constant/enum.js";
 import { isValid } from "../../middleware/vaildation.js";
-import {  loginReceptionistSchema, receptionistHospitalSchema } from "./admin_hospital.validation.js";
+import {  receptionistHospitalSchema, updateReceptionistSchema } from "./admin_hospital.validation.js";
 import { asyncHandler } from "../../middleware/asyncHandler.js";
-import { createReceptionist, loginReceptionist } from "./admin_hospital.controller.js";
+import { createReceptionist, getAllReceptionists, updateReceptionist } from "./admin_hospital.controller.js";
 
 
 const adminHospitalRouter = Router();
@@ -19,10 +19,20 @@ adminHospitalRouter.post('/create-receptionist',
  );
 
 
- // logon receptionist route
- adminHospitalRouter.post('/login/receptionist',
-     isValid(loginReceptionistSchema),
-     asyncHandler(loginReceptionist)
+ // update receptionist route
+ adminHospitalRouter.put('/update/:receptionistId',
+     isAuthenticated(),
+     isAuthorized([roles.ADMIN_HOSPITAL]),
+     isValid(updateReceptionistSchema),
+     asyncHandler(updateReceptionist) 
  );
+
+
+ // get all receptionists of hospital route
+ adminHospitalRouter.get('/receptionists',
+     isAuthenticated(),
+     isAuthorized([roles.ADMIN_HOSPITAL]),
+     asyncHandler(getAllReceptionists)
+    )
 
 export default adminHospitalRouter;

@@ -9,11 +9,6 @@ import { generalFields } from "../../middleware/vaildation.js";
 //     phoneNumber : generalFields.phoneNumber.optional(),
 // });
 
-// login super admin validation
-export const loginSuperAdminSchema = joi.object({
-    email : generalFields.email.required(),
-    password : generalFields.password.required(),
-});
 
 // create admin validation
 export const createAdminSchema = joi.object({
@@ -22,13 +17,6 @@ export const createAdminSchema = joi.object({
     password : generalFields.password.required(),
     phoneNumber : generalFields.phoneNumber.required(),
 });
-
-// login admin validation
-export const loginAdminSchema = joi.object({
-    email : generalFields.email.required(),
-    password : generalFields.password.required(),
-});
-
 
 // delete admin validation
 export const deleteAdminSchema = joi.object({
@@ -43,10 +31,3 @@ export const createHospitalAdminSchema = joi.object({
     phoneNumber : generalFields.phoneNumber.required(),
     hospitalId : generalFields.objectId.required(),
 })
-
-
-// logon hospital admin validation
-export const loginHospitalAdminSchema = joi.object({
-    email : generalFields.email.required(),
-    password : generalFields.password.required(),
-});
