@@ -140,3 +140,67 @@ export const getAllReceptionists = async (req, res, next) => {
     data: receptionists,
   });
 };
+
+
+// Delete Receptionist (ADMIN_HOSPITAL only)
+export const deleteReceptionist = async (req, res, next) => {
+  const { receptionistId } = req.params;
+
+  // Get the authenticated admin hospital
+  const adminHospital = req.authUser;
+
+  // Ensure only ADMIN_HOSPITAL can delete
+  if (adminHospital.role !== roles.ADMIN_HOSPITAL) {
+    return next(new AppError(messages.user.unauthorized, 403));
+  }
+
+  //  Find the receptionist by ID
+  const receptionist = await User.findById(receptionistId);
+  if (!receptionist) {
+    return next(new AppError(messages.user.notExist, 404));
+  }
+
+  // Ensure target user is a Receptionist
+  if (receptionist.role !== roles.RECEPTIONIST) {
+    return next(new AppError(messages.user.canOnlyDeleteReceptionists, 403));
+  }
+
+  //  Ensure receptionist belongs to the same hospital
+  if (receptionist.hospitalId.toString() !== adminHospital.hospitalId.toString()) {
+    return next(new AppError(messages.user.cannotDeleteOtherHospitalAdmins, 403));
+  }
+
+  //  Delete receptionist
+  await receptionist.deleteOne();
+
+  //  Return success response
+  return res.status(200).json({
+    message: messages.user.deleted,
+    success: true,
+  });
+};
+
+// Get Admin Hospital Profile
+export const getAdminHospitalProfile = async (req, res, next) => {
+  const adminHospitalId = req.authUser._id;
+
+  // Find admin hospital
+  const adminHospital = await User.findById(adminHospitalId);
+  if (!adminHospital) {
+    return next(new AppError(messages.admin.notExist, 404));
+  }
+
+  // Ensure role is ADMIN_HOSPITAL
+  if (adminHospital.role !== roles.ADMIN_HOSPITAL) {
+    return next(new AppError(messages.user.unauthorized, 403));
+  }
+
+  // Hide password
+  adminHospital.password = undefined;
+
+  return res.status(200).json({
+    message: messages.admin.fetchedSuccessfully,
+    success: true,
+    data: adminHospital,
+  });
+};

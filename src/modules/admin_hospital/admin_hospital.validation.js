@@ -19,3 +19,9 @@ export const updateReceptionistSchema = joi.object({
     phoneNumber : generalFields.phoneNumber.optional(),
     password : generalFields.password.optional(),
 })
+
+
+// delete receptionist validation
+export const deleteReceptionistSchema = joi.object({
+    receptionistId : generalFields.objectId.required(),
+})

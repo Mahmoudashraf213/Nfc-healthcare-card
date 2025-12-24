@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { AppError } from '../../utils/appError.js';
 import { messages } from '../../utils/constant/messages.js';
 import { generateToken, verifyToken } from '../../utils/token.js';
-import { Doctor, Patient, User } from '../../../db/index.js';
+import { Doctor, Hospital, Patient, User } from '../../../db/index.js';
 import { roles } from '../../utils/constant/enum.js';
 import { sendEmail } from '../../utils/sendEmail.js';
 import { generateOTP, sendOTP } from '../../utils/OTP.js';
@@ -98,6 +98,12 @@ export const signupDoctor = async (req, res, next) => {
     hospitalId
   } = req.body;
 
+  // Make sure hospital exists
+  const hospitalExists = await Hospital.findById(hospitalId);
+  if (!hospitalExists) {
+    return next(new AppError(messages.hospital.notExist, 404));
+  }
+
   // Check if doctor already exists (email or phone)
   const doctorExists = await Doctor.findOne({
     $or: [{ email }, { phoneNumber }]
@@ -190,36 +196,53 @@ export const verifyDoctorAccount = async (req, res, next) => {
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  //  Check user existence (include password)
-  const user = await User.findOne({ email }).select("+password");
-  if (!user) {
+  let account = null;
+  let accountType = null;
+
+  //  Try User collection first
+  account = await User.findOne({ email }).select("+password");
+  if (account) {
+    accountType = "USER";
+  }
+
+  //  If not found → try Doctor collection
+  if (!account) {
+    account = await Doctor.findOne({ email }).select("+password");
+    if (account) {
+      accountType = "DOCTOR";
+    }
+  }
+
+  //  If still not found
+  if (!account) {
     return next(new AppError(messages.user.invalidCredentials, 401));
   }
 
   //  Check password
-  const isPasswordValid = bcrypt.compareSync(password, user.password);
+  const isPasswordValid = bcrypt.compareSync(password, account.password);
   if (!isPasswordValid) {
     return next(new AppError(messages.user.invalidCredentials, 401));
   }
 
-  //  Check verification status (if required)
-  if (user.isVerified === false) {
+  //  Check verification
+  if (account.isVerified === false) {
     return next(new AppError(messages.user.notVerified, 403));
   }
 
-  //  Generate token (include role + hospitalId)
+  //  Generate token
   const token = generateToken({
     payload: {
-      _id: user._id,
-      role: user.role,
-      hospitalId: user.hospitalId || null,
+      _id: account._id,
+      role: account.role,
+      hospitalId: account.hospitalId || null,
+      model: accountType, // VERY IMPORTANT
     },
   });
 
   //  Hide password
-  user.password = undefined;
+  account.password = undefined;
 
-  //  Send response
+  //  Response
   return res.status(200).json({
     message: messages.user.loginSuccess,
     success: true,

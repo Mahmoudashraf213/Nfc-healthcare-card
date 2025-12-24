@@ -56,7 +56,7 @@ authRouter.post('/doctor/reset-password',
 // update patient password route
 authRouter.put('/patient/update',
     isAuthenticated(),
-    isAuthorized([roles.PATIENT , roles.ADMIN, roles.SUPER_ADMIN , roles.DOCTOR]),
+    isAuthorized([roles.ADMIN, roles.SUPER_ADMIN , roles.DOCTOR]),
     isValid(updatePatientProfileSchema),
     asyncHandler(updatePatientProfile)
 )
@@ -64,7 +64,7 @@ authRouter.put('/patient/update',
 // update doctor profile route
 authRouter.put('/doctor/update',
     isAuthenticated(),
-    isAuthorized([roles.DOCTOR , roles.ADMIN, roles.SUPER_ADMIN]),
+    isAuthorized([roles.DOCTOR , roles.ADMIN, roles.SUPER_ADMIN , roles.HOSPITAL_ADMIN]),
     isValid(updateDoctorProfileSchema),
     asyncHandler(updateDoctorProfile)
 )

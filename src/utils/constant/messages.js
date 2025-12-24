@@ -42,6 +42,8 @@ export const messages = {
         unauthorized: 'You are not authorized to perform this action',
         cannotCreateAdminHospital: 'Only SUPER_ADMIN or ADMIN can create hospital admins',
         emailTaken: 'Email is already taken',
+        cannotDeleteOtherHospitalAdmins: 'You can only delete hospital admins created by you',
+        canOnlyDeleteReceptionists: 'You can only delete receptionists',
     },
     admin :{
         ...generateMessage('Admin'),
