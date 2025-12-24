@@ -1,6 +1,6 @@
 import cors from "cors";
 import { globalErrorHandling } from "./utils/appError.js";
-import { adminHospitalRouter, adminRouter, authRouter, hospitalRouter } from "./modules/index.js";
+import { adminHospitalRouter, adminRouter, authRouter, hospitalRouter, medicalRecordRouter, receptionistRouter } from "./modules/index.js";
 
 export const bootStrap = (app, express) => {
   // parse req
@@ -17,6 +17,8 @@ export const bootStrap = (app, express) => {
   app.use("/admin" , adminRouter);
   app.use("/hospital" , hospitalRouter);
   app.use("/admin-hospital" , adminHospitalRouter);
+  app.use("/medical-record" , medicalRecordRouter);
+  app.use("/receptionist" , receptionistRouter);
   // global error
   app.use(globalErrorHandling);
 };

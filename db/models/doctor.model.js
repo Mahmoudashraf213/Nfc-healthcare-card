@@ -54,6 +54,7 @@ const doctorSchema = new Schema(
     },
     otp: String,
     otpExpires: String,
+    patients: [{ type: Schema.Types.ObjectId, ref: "Patient" }],
 
   },
   { timestamps: true }

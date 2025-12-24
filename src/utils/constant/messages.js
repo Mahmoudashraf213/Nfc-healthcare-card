@@ -30,6 +30,9 @@ export const messages = {
         samePassword: 'The new password cannot be the same as the old password',
         passwordUpdated: 'Doctor password updated successfully',
         emailTaken: 'Email is already taken',
+        notInHospital: 'Doctor does not belong to the specified hospital',
+        patientAssigned: 'Patient assigned to doctor successfully',
+        patientsFetched: "Doctor's patients fetched successfully",
 
     },
     user :{
@@ -56,5 +59,10 @@ export const messages = {
         emailTaken: 'Email is already taken',
         nameTaken: 'Hospital name is already taken',
     },
+    medicalRecord :{
+        ...generateMessage('Medical record'),
+        cannotUpdate: 'You are not authorized to update this medical record',
+        cannotDeleteOthers : 'You are not authorized to delete this medical record',
+    }
 
 }
